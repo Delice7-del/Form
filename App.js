@@ -14,6 +14,7 @@ import {
   Image,
   StyleSheet,
   Platform,
+  Alert,
 } from 'react-native';
 import Checkbox from 'expo-checkbox';
 import { Picker } from '@react-native-picker/picker';
@@ -26,7 +27,6 @@ export default function App() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
   const [website, setWebsite] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -56,7 +56,7 @@ export default function App() {
   const [time, setTime] = useState(new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
 
-  // 9. Image picker state
+  // 9. Camera / Image picker state
   const [imageUri, setImageUri] = useState(null);
 
   // 10. Terms & Conditions state
@@ -95,6 +95,27 @@ export default function App() {
     }
     if (selectedTime) {
       setTime(selectedTime);
+    }
+  };
+
+  // Launch camera to take a photo
+  const takePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(
+        'Permission Required',
+        'Camera permission is required to take photos.'
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setImageUri(result.assets[0].uri);
     }
   };
 
@@ -146,7 +167,6 @@ export default function App() {
       fullName: fullName.trim(),
       email: email.trim(),
       phone: phone.trim(),
-      searchQuery: searchQuery.trim(),
       website: website.trim(),
       password: password,
       showPassword: showPassword,
@@ -171,7 +191,6 @@ export default function App() {
     setFullName('');
     setEmail('');
     setPhone('');
-    setSearchQuery('');
     setWebsite('');
     setPassword('');
     setShowPassword(false);
@@ -235,17 +254,8 @@ export default function App() {
           keyboardType="phone-pad"
         />
 
-        {/* 4. Search Input */}
-        <Text style={styles.label}>4. Search Keyword:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Search items, topics, etc."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-
-        {/* 5. URL Input */}
-        <Text style={styles.label}>5. Website / Portfolio URL:</Text>
+        {/* 4. URL Input */}
+        <Text style={styles.label}>4. Website / Portfolio URL:</Text>
         <TextInput
           style={styles.input}
           placeholder="https://example.com"
@@ -255,8 +265,8 @@ export default function App() {
           autoCapitalize="none"
         />
 
-        {/* 6. Password with Visibility Toggle */}
-        <Text style={styles.label}>6. Password:</Text>
+        {/* 5. Password with Visibility Toggle */}
+        <Text style={styles.label}>5. Password:</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter your password"
@@ -276,8 +286,8 @@ export default function App() {
           <Text style={styles.checkboxLabel}>Show Password</Text>
         </Pressable>
 
-        {/* 7. Age */}
-        <Text style={styles.label}>7. Age:</Text>
+        {/* 6. Age */}
+        <Text style={styles.label}>6. Age:</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter your age"
@@ -286,8 +296,8 @@ export default function App() {
           keyboardType="numeric"
         />
 
-        {/* 8. Address / Description */}
-        <Text style={styles.label}>8. Address / Description:</Text>
+        {/* 7. Address / Description */}
+        <Text style={styles.label}>7. Address / Description:</Text>
         <TextInput
           style={[styles.input, styles.multilineInput]}
           placeholder="Enter address or description"
@@ -297,8 +307,8 @@ export default function App() {
           numberOfLines={4}
         />
 
-        {/* 9. Gender (Circular Radio Buttons) */}
-        <Text style={styles.label}>9. Gender (Radio Buttons):</Text>
+        {/* 8. Gender (Circular Radio Buttons) */}
+        <Text style={styles.label}>8. Gender (Radio Buttons):</Text>
         <View style={styles.radioGroup}>
           <Pressable
             accessibilityRole="radio"
@@ -337,8 +347,8 @@ export default function App() {
           </Pressable>
         </View>
 
-        {/* 10. Hobbies (Checkboxes) */}
-        <Text style={styles.label}>10. Hobbies (Checkboxes):</Text>
+        {/* 9. Hobbies (Checkboxes) */}
+        <Text style={styles.label}>9. Hobbies (Checkboxes):</Text>
         <View style={styles.checkboxGroup}>
           <Pressable
             style={styles.checkboxRow}
@@ -386,8 +396,8 @@ export default function App() {
           </Pressable>
         </View>
 
-        {/* 11. Country Picker */}
-        <Text style={styles.label}>11. Country (Picker / Dropdown):</Text>
+        {/* 10. Country Picker */}
+        <Text style={styles.label}>10. Country (Picker / Dropdown):</Text>
         <View style={styles.pickerWrapper}>
           <Picker
             selectedValue={country}
@@ -404,8 +414,8 @@ export default function App() {
           </Picker>
         </View>
 
-        {/* 12. Notifications Switch */}
-        <Text style={styles.label}>12. Notifications (Switch):</Text>
+        {/* 11. Notifications Switch */}
+        <Text style={styles.label}>11. Notifications (Switch):</Text>
         <View style={styles.switchRow}>
           <Text style={styles.switchText}>
             {notifications ? 'Notifications are ON' : 'Notifications are OFF'}
@@ -416,8 +426,8 @@ export default function App() {
           />
         </View>
 
-        {/* 13. Rating Slider */}
-        <Text style={styles.label}>13. Rating (Slider): {rating} / 10</Text>
+        {/* 12. Rating Slider */}
+        <Text style={styles.label}>12. Rating (Slider): {rating} / 10</Text>
         <Slider
           style={styles.slider}
           minimumValue={1}
@@ -427,8 +437,8 @@ export default function App() {
           onValueChange={setRating}
         />
 
-        {/* 14. Date Picker */}
-        <Text style={styles.label}>14. Date Selection (DatePicker):</Text>
+        {/* 13. Date Picker */}
+        <Text style={styles.label}>13. Date Selection (DatePicker):</Text>
         <Text style={styles.dateDisplay}>Selected Date: {date.toDateString()}</Text>
         <View style={styles.buttonWrapper}>
           <Button
@@ -445,8 +455,8 @@ export default function App() {
           />
         )}
 
-        {/* 15. Time Picker */}
-        <Text style={styles.label}>15. Time Selection (TimePicker):</Text>
+        {/* 14. Time Picker */}
+        <Text style={styles.label}>14. Time Selection (TimePicker):</Text>
         <Text style={styles.dateDisplay}>
           Selected Time: {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </Text>
@@ -465,23 +475,29 @@ export default function App() {
           />
         )}
 
-        {/* 16. Image / File Picker */}
-        <Text style={styles.label}>16. Image / File Picker:</Text>
+        {/* 15. Photo (Camera / Gallery) */}
+        <Text style={styles.label}>15. Photo (Camera / Gallery):</Text>
         <Text style={styles.dateDisplay}>
-          {imageUri ? `Selected: ${imageUri.split('/').pop()}` : 'No image chosen'}
+          {imageUri ? `Selected: ${imageUri.split('/').pop()}` : 'No photo chosen'}
         </Text>
         {imageUri && (
           <Image source={{ uri: imageUri }} style={styles.imagePreview} />
         )}
         <View style={styles.buttonWrapper}>
           <Button
-            title={imageUri ? 'Change Image' : 'Pick an Image'}
+            title="Open Camera"
+            onPress={takePhoto}
+          />
+        </View>
+        <View style={styles.buttonWrapper}>
+          <Button
+            title={imageUri ? 'Change from Gallery' : 'Upload from Gallery'}
             onPress={pickImage}
           />
         </View>
 
-        {/* 17. Terms & Conditions Checkbox */}
-        <Text style={styles.label}>17. Terms & Conditions:</Text>
+        {/* 16. Terms & Conditions Checkbox */}
+        <Text style={styles.label}>16. Terms & Conditions:</Text>
         <Pressable
           style={styles.checkboxRow}
           onPress={() => setAgreeTerms(!agreeTerms)}
